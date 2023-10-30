@@ -24,12 +24,24 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
-
+      - run: echo "hello world !! " > file.txt
+      - uses: actions/upload-artifact@v3
+        with: 
+          name: file
+          path: file.txt
+          
       - name: Run markdown lint
         run: |
           npm install remark-cli remark-preset-lint-consistent
           npx remark . --use remark-preset-lint-consistent --frail
 
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with: 
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - run: npm run build --if-present
+    
       - uses: actions/upload-artifact@v3
         with:
           name: remark-lint-report
